@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sick O'Clock — A Campus Story</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green: #00FF00;
+    --cyan: #00FFFF;
+    --bg: #0d0d0d;
+    --bg2: #121212;
+    --bg3: #1a1a1a;
+    --text: #FFFFFF;
+    --text-muted: #aaaaaa;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.8;
+    cursor: default;
+  }
+
+  /* Scanline overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,255,0,0.015) 2px,
+      rgba(0,255,0,0.015) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background-color: var(--bg3);
+    border-bottom: 3px solid var(--green);
+    padding: 0;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    animation: headerIn 0.6s ease both;
+  }
+
+  @keyframes headerIn {
+    from { transform: translateY(-100%); opacity: 0; }
+    to   { transform: translateY(0);     opacity: 1; }
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .site-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.1rem;
+    color: var(--green);
+    letter-spacing: 0.05em;
+    text-shadow: 0 0 8px var(--green);
+  }
+
+  nav { display: flex; gap: 0; }
+
+  nav a {
+    color: var(--green);
+    margin: 0 1rem;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: color 0.2s, text-shadow 0.2s;
+  }
+
+  nav a:hover {
+    color: var(--cyan);
+    text-shadow: 0 0 8px var(--cyan);
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 50% 60%, rgba(0,255,0,0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 30% at 80% 20%, rgba(0,255,255,0.05) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .hero-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--cyan);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.7s 0.3s ease forwards;
+  }
+
+  .hero h1 {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(3rem, 10vw, 7rem);
+    font-weight: 700;
+    line-height: 1;
+    color: var(--green);
+    text-shadow: 0 0 40px rgba(0,255,0,0.4), 0 0 80px rgba(0,255,0,0.2);
+    margin-bottom: 1rem;
+    opacity: 0;
+    animation: fadeUp 0.7s 0.5s ease forwards;
+    letter-spacing: -0.02em;
+  }
+
+  .hero-sub {
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    color: var(--text-muted);
+    font-style: italic;
+    font-weight: 300;
+    max-width: 520px;
+    margin-bottom: 2.5rem;
+    opacity: 0;
+    animation: fadeUp 0.7s 0.7s ease forwards;
+  }
+
+  .hero-meta {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--green);
+    letter-spacing: 0.1em;
+    opacity: 0;
+    animation: fadeUp 0.7s 0.9s ease forwards;
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .hero-meta span { opacity: 0.7; }
+  .hero-meta strong { color: var(--cyan); opacity: 1; }
+
+  .scroll-cue {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--green);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadeUp 0.7s 1.2s ease forwards, pulse 2s 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+  /* ── STORY BODY ── */
+  .story-container {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 4rem 2rem 6rem;
+  }
+
+  .chapter {
+    margin-bottom: 5rem;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .chapter.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .chapter-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--cyan);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .chapter h2 {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(1.4rem, 4vw, 2rem);
+    color: var(--green);
+    text-shadow: 0 0 20px rgba(0,255,0,0.3);
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(0,255,0,0.2);
+  }
+
+  article {
+    background-color: var(--bg2);
+    border-left: 4px solid var(--cyan);
+    padding: 1.8rem 1.8rem 1.8rem 2rem;
+    margin: 1.5rem 0;
+    border-radius: 0 8px 8px 0;
+    box-shadow: 0 0 18px rgba(0,255,0,0.12), inset 0 0 40px rgba(0,0,0,0.3);
+    font-size: 1.05rem;
+    line-height: 1.9;
+    color: #e8e8e8;
+  }
+
+  article p { margin-bottom: 1.2rem; }
+  article p:last-child { margin-bottom: 0; }
+
+  /* dialogue */
+  .sheng {
+    color: var(--cyan);
+    font-style: italic;
+  }
+
+  .translation {
+    color: var(--text-muted);
+    font-size: 0.9em;
+    font-style: italic;
+  }
+
+  /* section divider */
+  .divider {
+    text-align: center;
+    color: var(--green);
+    font-family: 'Space Mono', monospace;
+    font-size: 1rem;
+    letter-spacing: 0.5em;
+    margin: 2rem 0;
+    opacity: 0.4;
+  }
+
+  /* pull quote */
+  .pull-quote {
+    border: none;
+    border-left: none;
+    background: transparent;
+    box-shadow: none;
+    padding: 1rem 0;
+    text-align: center;
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    color: var(--green);
+    font-style: italic;
+    text-shadow: 0 0 15px rgba(0,255,0,0.3);
+    line-height: 1.6;
+    margin: 2rem 0;
+  }
+
+  /* ── SHARE ── */
+  .share-section {
+    margin-top: 5rem;
+    text-align: center;
+    padding: 3rem 2rem;
+    border-top: 1px solid rgba(0,255,0,0.2);
+  }
+
+  .share-section p {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+  }
+
+  .share-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+  a.share-twitter {
+    background-color: var(--green);
+    color: #0d0d0d;
+    padding: 0.6rem 1.4rem;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 700;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    text-transform: uppercase;
+  }
+
+  a.share-twitter:hover {
+    background-color: var(--cyan);
+    color: #000;
+    box-shadow: 0 0 20px rgba(0,255,255,0.4);
+  }
+
+  a.share-whatsapp {
+    background-color: transparent;
+    color: var(--green);
+    padding: 0.6rem 1.4rem;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 700;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    border: 1px solid var(--green);
+    transition: background-color 0.3s, box-shadow 0.3s;
+    text-transform: uppercase;
+  }
+
+  a.share-whatsapp:hover {
+    background-color: rgba(0,255,0,0.1);
+    box-shadow: 0 0 20px rgba(0,255,0,0.3);
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background-color: var(--bg3);
+    color: var(--green);
+    text-align: center;
+    padding: 1.5rem 2rem;
+    border-top: 3px solid var(--green);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+  }
+
+  footer span { color: var(--cyan); }
+
+  /* ── READING PROGRESS BAR ── */
+  #progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--green), var(--cyan));
+    width: 0%;
+    z-index: 9999;
+    box-shadow: 0 0 8px var(--green);
+    transition: width 0.1s linear;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .header-inner { flex-direction: column; gap: 0.75rem; }
+    nav a { margin: 0 0.5rem; }
+    .hero-meta { gap: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<header>
+  <div class="header-inner">
+    <div class="site-title">// SICK O'CLOCK</div>
+    <nav>
+      <a href="#story">Read</a>
+      <a href="#chapter-2">Part II</a>
+      <a href="#chapter-3">Part III</a>
+      <a href="#share">Share</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-tag">A Campus Story — Nairobi</div>
+  <h1>SICK<br>O'CLOCK</h1>
+  <p class="hero-sub">Ever wondered how young lads immediately change after joining campus?</p>
+  <div class="hero-meta">
+    <div><span>Genre </span><strong>Urban Fiction</strong></div>
+    <div><span>Setting </span><strong>Nairobi Campus</strong></div>
+    <div><span>Vibe </span><strong>Raw · Real · Reckless</strong></div>
+  </div>
+  <div style="margin-top:1.5rem; font-family:'Space Mono',monospace; font-size:0.78rem; letter-spacing:0.1em; opacity:0; animation: fadeUp 0.7s 1.1s ease forwards;">
+    <span style="color:#aaaaaa;">cc &copy; </span><span style="color:#00FF00;">Karani Wahome</span><span style="color:#aaaaaa;"> &nbsp;·&nbsp; 2026 &nbsp;·&nbsp; </span><a href="https://twitter.com/tonibraxxxxx" target="_blank" style="color:#00FFFF; text-decoration:none;">@tonibraxxxxx</a>
+  </div>
+  <div class="scroll-cue">▼ &nbsp; scroll to read &nbsp; ▼</div>
+</section>
+
+<main class="story-container" id="story">
+
+  <!-- CHAPTER 1 -->
+  <div class="chapter" id="chapter-1">
+    <div class="chapter-label">Chapter One</div>
+    <h2>Morning Session</h2>
+
+    <article>
+      <p>Ever wondered how young lads immediately change after joining campus? Ever heard of phrases like <em>'kugongewa'</em> <em>'kudinyiwa'</em>….. If you recognise such words you'll deeply relate to how painful they can be, based on how they are used and on who.</p>
+
+      <p>It's sick o'clock in the morning and as usual hemp is my starter pack, for me and two of my friends Sheila and Terry, who had already woken up and ready for their morning hemp. But alas today something is not normal or usual as it used to be. Sheila, who is six feet of figured trouble, built in a way that caused problems and clearly knew it, is cursing the morning with <span class="sheng">"umbwa! Leo lazima Nidinyie uyo deem"</span> and by that I knew that day we would smoke until the walls talked back.</p>
+
+      <p>Terry, who never says much before her second joint, looked up from her phone and muttered <span class="sheng">"ni nani tena?"</span> <span class="translation">— who is it this time?</span> Like Sheila's situationships had a rotating roster. Which honestly, they did.</p>
+
+      <p>She didn't answer. Just snatched the joint from my fingers without asking — classic Sheila — and took a drag deep enough to borrow time from tomorrow. The room was still half dark, curtains doing a bad job of keeping the morning out. Our bedsitter smelled like last night's ugali and whatever this morning was becoming.</p>
+
+      <p>She exhaled slow, smoke unwinding toward the ceiling like it had nowhere urgent to be.</p>
+
+      <p><span class="sheng">"Si muache tu,"</span> I said. <span class="translation">Just let it go.</span></p>
+
+      <p><span class="sheng">"Nimeacha."</span> <span class="translation">I've let it go.</span> She took another drag. <span class="sheng">"Hiyo ndiyo kuacha."</span> <span class="translation">That's what letting go looks like.</span></p>
+
+      <p>Terry and I exchanged a look above her head. We had both seen this version of Sheila before. The calm one. The one that smiled too evenly and moved too deliberately. This was not peace — this was a woman who had already decided something and was simply waiting for the right moment to execute it.</p>
+
+      <p>We smoked in comfortable silence after that, the joint making its rounds, the morning softening its edges around us. Outside, Nairobi was already loud — a boda boda arguing with a matatu, someone's music bleeding through thin walls, a dog that had been barking since five and clearly had unresolved issues.</p>
+
+      <p>Terry sat cross-legged on the bed in her oversized sleep shirt, scrolling through her phone with one hand, holding the joint with the other, unbothered in the specific way that only Terry could be unbothered — like the world was a mildly interesting show she was watching from a comfortable distance. She was small, Terry. The kind of small that made people underestimate her until she opened her mouth and rearranged their whole understanding of a situation.</p>
+
+      <p>Campus mornings have their own specific texture. Unbothered and chaotic at the same time.</p>
+    </article>
+
+    <div class="divider">— ✦ —</div>
+
+    <article>
+      <p>By eight we were hungry in that hollow, cotton-mouthed way that only follows a proper morning session. Terry was already debating breakfast with the seriousness of a government committee.</p>
+
+      <p><span class="sheng">"Mama Njeri?"</span> she offered, not looking up from her phone.</p>
+
+      <p><span class="sheng">"Kama kawaida."</span> <span class="translation">As usual.</span> Sheila was already pulling her oversized hoodie over yesterday's shorts, not bothering with much else. That was the thing about Sheila — she could look like she had tried when she hadn't, and look like she hadn't tried when she had put in serious effort. It was a gift that quietly annoyed every other girl on this campus.</p>
+
+      <p>Mama Njeri's was a two-minute walk that took us longer because Terry stopped to greet the mandazi woman at the gate, then stood for three full minutes discussing something passionately with her about a TV show. That was Terry — she had a relationship with every person she had ever met, however briefly, and took all of them seriously.</p>
+
+      <p>The small café was already half full — serious students who had 7am classes and the not-so-serious ones who had skipped those classes and were now eating as compensation. The smell hit first — tea, eggs, smokiness from the jiko, that specific warm smell that Mama Njeri's always had, like somebody's grandmother ran the place. Somebody's grandmother did.</p>
+
+      <p>We squeezed into our usual table near the window. Sheila ordered without looking at the menu. Maandazi four, chai one, egg in the middle. Terry ordered a full plate — beans, two eggs, chapati — and then ate all of it with zero apology, which was one of the many things I respected about her.</p>
+
+      <p><span class="sheng">"Uko sawa?"</span> I asked quietly. <span class="translation">You okay?</span></p>
+
+      <p>She turned and looked at me. Then she smiled — a real one this time, small and a little tired.</p>
+
+      <p><span class="sheng">"Niko tu."</span> <span class="translation">I'm fine.</span> She dunked her maandazi. <span class="sheng">"Leo tutaenjoy."</span> <span class="translation">Today we'll enjoy ourselves.</span></p>
+
+      <p>Terry looked up from her plate. <span class="sheng">"Tutaenjoy ama unataka kurudi home na mtu?"</span> She raised an eyebrow. <span class="translation">We'll enjoy or you want to go home with someone?</span></p>
+
+      <p>Sheila laughed — properly this time, the full version. <span class="sheng">"Mbona si zote mbili?"</span> <span class="translation">Why not both?</span></p>
+
+      <p>Terry pointed her fork approvingly. <span class="sheng">"Sasa unasema."</span> <span class="translation">Now you're talking.</span></p>
+    </article>
+  </div>
+
+  <!-- CHAPTER 2 -->
+  <div class="chapter" id="chapter-2">
+    <div class="chapter-label">Chapter Two</div>
+    <h2>Dr. Kamau's Lecture</h2>
+
+    <article>
+      <p>By two in the afternoon we were in Dr. Kamau's Health Systems lecture, which is exactly as interesting as it sounds — which is to say, not very. The lecture hall was the large one on the second floor that smelled like permanent markers and ambition that had been slowly suffocating since first year.</p>
+
+      <p>Terry sat beside me, her notebook open, her pen actually moving — but if you looked closely she was drawing an elaborate cityscape in the margins, buildings getting more detailed as the lecture got more boring. Sheila was on my other side, one earbud in, her long legs stretched under the seat in front, occupying space the way she occupied most things — completely and without guilt.</p>
+
+      <p>Dr. Kamau was a man who believed deeply in what he taught and had unfortunately not yet accepted that this belief was not contagious. He paced. He gesticulated. He wrote things on the board with the enthusiasm of someone delivering news that would change lives.</p>
+
+      <p>Still, he had moments.</p>
+
+      <p>Today his moment was this: <em>"The most dangerous thing in any system is the assumption that someone else is responsible for its integrity."</em></p>
+
+      <p>I wrote it down. Sheila, who I thought wasn't listening, wrote it down too. We looked at each other.</p>
+
+      <p>Terry glanced over at our notebooks, then at us, then back at her cityscape. She added a tiny figure on top of one of her buildings — a woman, arms wide open, looking out over everything.</p>
+
+      <p>Sometimes Terry communicated entirely in drawings and you understood her perfectly.</p>
+    </article>
+  </div>
+
+  <!-- CHAPTER 3 -->
+  <div class="chapter" id="chapter-3">
+    <div class="chapter-label">Chapter Three</div>
+    <h2>Levels</h2>
+
+    <article>
+      <p>By eight that evening the day had shifted completely — the way Nairobi evenings do, like someone reached up and changed the filter on everything. The air cooled. The streets got louder in a different key. People who had been invisible all day suddenly emerged, dressed differently, walking differently, wearing the night like a second skin.</p>
+
+      <p>We were at Levels.</p>
+
+      <p>If you know, you know. If you don't — Levels is the place on this side of Nairobi where campus life comes to fully express itself, every Thursday and Friday without negotiation. The kind of spot that has a bouncer who knows your name but still charges you, music that you feel in your sternum before you even get through the door, and lighting specifically designed to make everyone look like the best version of themselves.</p>
+
+      <p>Sheila had transformed. The tired girl with the hoodie and the chai mug was completely gone. In her place was six feet of deliberate — a dress that moved when she moved, her natural hair out and wild in the way she only wore it when she had fully decided to take up space. She smelled like something that cost more than it should and knew it.</p>
+
+      <p>Terry had worn a small black dress that was doing a lot of work and was aware of it. She had that look she got when she had decided tonight was going to be interesting — chin slightly up, eyes already scanning the room as they walked in, like a general assessing terrain.</p>
+
+      <p>We found Blessed and Kay at a table near the back, a bottle of something bright between them, the bass from the speakers making the ice in the glasses shiver.</p>
+
+      <p><span class="sheng">"Mlikuwa wapi?"</span> Blessed shouted over the music. <span class="translation">Where were you?</span></p>
+
+      <p><span class="sheng">"Tulikuwa tunakuja tu!"</span> Terry shouted back, already reaching for a glass and already making eye contact with someone across the room simultaneously. The girl was a gifted multitasker.</p>
+    </article>
+
+    <div class="pull-quote">"The dancefloor was a moving thing, bodies finding rhythms together — music at this hour is not entertainment. It's permission."</div>
+
+    <article>
+      <p>Sheila didn't sit for long. She never did. By the second song she was on the floor, moving the way she did everything — like she had already decided the outcome and was just enjoying the process. A guy in a grey shirt drifted close, said something in her ear. She laughed — head back, full and unguarded — and let him stay. Her hands found his shoulders loosely, the way you hold something you haven't decided to keep yet but aren't ready to put down.</p>
+
+      <p>Terry meanwhile had located the person she had been making eye contact with from across the room — a tall girl in a yellow top with locs past her shoulders — and was now at the bar with her, the two of them leaning close over the music, Terry's hand resting on the counter near hers, their heads bent together like they were sharing something too valuable for the noise to touch. The yellow-top girl said something and Terry threw her head back laughing, then brought her face close again, closer than before.</p>
+
+      <p>The small, precise architecture of something beginning.</p>
+
+      <p>I sat with Blessed and Kay, drink in hand, watching the room do what rooms like this do at this hour. The dancefloor pressed and swayed. Sheila on the floor, grey-shirt's hands now at her waist, her body making decisions her mouth hadn't announced yet — that loose, electric back-and-forth of two people negotiating through movement what they haven't yet said out loud.</p>
+
+      <p>By midnight Sheila caught my eye from across the floor and raised her glass at me. I raised mine back.</p>
+
+      <p><em>Leo tutaenjoy.</em> She had said it this morning over chai, maandazi in hand, smoke still in her system, hurt still fresh.</p>
+
+      <p>She had, as always, been completely right.</p>
+    </article>
+  </div>
+
+  <!-- CHAPTER 4 -->
+  <div class="chapter" id="chapter-4">
+    <div class="chapter-label">Chapter Four</div>
+    <h2>After Midnight</h2>
+
+    <article>
+      <p>Grey-shirt's name was Kelvin.</p>
+
+      <p>Sheila found this out at around 1am when the music slowed and he spoke directly into her ear for the first time with actual words rather than implications. He smelled like good cologne and Jameson and something underneath both of those things that was just him — warm and specific in the way people are when you get close enough to find out.</p>
+
+      <p><span class="sheng">"Unaitwa nani?"</span> <span class="translation">What's your name?</span></p>
+
+      <p><span class="sheng">"Sheila."</span></p>
+
+      <p>"Sheila." He said it back like he was testing how it felt in his mouth. Apparently it felt fine because he smiled — slow, unhurried — and kept his hands where they were, low on her waist, thumbs tracing absent patterns through the fabric of her dress like he had all the time in the world and knew it.</p>
+
+      <p><span class="sheng">"Unaishi wapi?"</span> <span class="translation">Where do you stay?</span></p>
+
+      <p><span class="sheng">"Karibu."</span> <span class="translation">Nearby.</span> She tilted her head slightly. <span class="sheng">"Mbona?"</span> <span class="translation">Why?</span></p>
+
+      <p>He smiled again. Same unhurried thing. <span class="sheng">"Nilikuwa nataka kujua tu."</span> <span class="translation">I was just wondering.</span></p>
+
+      <p>She held his gaze for a moment — long enough to make him wait, which was important, which was always important — and then she turned back to the music like the conversation was over. But she didn't move away from his hands.</p>
+    </article>
+
+    <div class="divider">— ✦ —</div>
+
+    <article>
+      <p>Across the room Terry and the yellow-top girl — whose name was Amina, Terry had established this within the first four minutes — had run out of things to pretend they were doing at the bar.</p>
+
+      <p><span class="sheng">"Twende nje kidogo."</span> Amina said it quietly, her mouth close to Terry's ear, her locs brushing Terry's cheek as she pulled back. <span class="translation">Let's step outside a bit.</span></p>
+
+      <p>Outside, the night air was cool and the street was doing its Nairobi thing — loud in patches, the distant pulse of music from inside, a group of guys arguing cheerfully near a parked car, the smell of nyama choma from somewhere. They stood close. Terry was small next to Amina, which almost never happened to Terry, and she was finding that she didn't mind it.</p>
+
+      <p>"Architecture," Amina repeated softly after Terry explained herself. "So you see the structure in everything."</p>
+
+      <p>"In most things." Terry held her gaze. "Not everything needs structure."</p>
+
+      <p>A beat. The kind of beat that has weight.</p>
+
+      <p>Terry closed the remaining distance between them — not much, just enough — and kissed her. Soft first, like a question. Then Amina's hand came up to Terry's jaw and the question got its answer and became something else entirely.</p>
+
+      <p>When they separated Terry looked up at her.</p>
+
+      <p><span class="sheng">"Kwangu ama kwako?"</span> <span class="translation">Mine or yours?</span></p>
+
+      <p>Amina smiled. Took Terry's hand. <span class="sheng">"Kwangu. Ni karibu zaidi."</span> <span class="translation">Mine. It's closer.</span></p>
+    </article>
+  </div>
+
+  <!-- CHAPTER 5 -->
+  <div class="chapter" id="chapter-5">
+    <div class="chapter-label">Chapter Five</div>
+    <h2>The Morning After</h2>
+
+    <article>
+      <p>It was Terry who came back first — at 7am, still in her black dress, heels in her hand, walking in with the specific unbothered energy of a woman who had made excellent decisions and was at peace with all of them.</p>
+
+      <p>She found me in the kitchen boiling water and said nothing, just sat at the table, elbows on the surface, chin in both hands, smiling at absolutely nothing.</p>
+
+      <p><span class="sheng">"Ulilala?"</span> I asked. <span class="translation">Did you sleep?</span></p>
+
+      <p><span class="sheng">"Kidogo."</span> <span class="translation">A little.</span> The smile didn't move.</p>
+
+      <p>"Amina?"</p>
+
+      <p>She looked at me then — that look Terry got when something had genuinely surprised her, which was rare, which is why you noticed it when it happened.</p>
+
+      <p><span class="sheng">"Hiyo mtu,"</span> she said softly. <span class="translation">That person.</span> Just that. Like she hadn't found the rest of the words yet and wasn't sure ordinary words would be adequate anyway.</p>
+
+      <p>Sheila arrived at 8:15. She came through the door in a borrowed oversized t-shirt that hit her mid-thigh, her own dress folded under her arm. She set her heels down by the door, looked at the two of us at the table, assessed the scene, and went directly to the kettle.</p>
+
+      <p>She poured herself a cup, came to the table, sat down. The three of us sat in the particular comfortable silence of people who have known each other long enough that silence is not empty — it's full of everything that doesn't need to be said out loud.</p>
+
+      <p>Terry was still smiling at nothing. Sheila looked at her. <span class="sheng">"Ulifanya nini usiku?"</span> <span class="translation">What did you do last night?</span></p>
+
+      <p><span class="sheng">"Nilipumzika."</span> <span class="translation">I rested.</span> Terry said it so seriously that both Sheila and I looked at her face and then all three of us were laughing — real, loud, morning laughter, the kind that bounced off the thin walls and probably woke up the neighbours and absolutely did not care.</p>
+
+      <p>When it settled Sheila was shaking her head, still smiling. <span class="sheng">"Na wewe?"</span> Terry asked. <span class="translation">And you?</span></p>
+
+      <p>Sheila sipped her chai. Looked out the window at the road outside — same Nairobi, same noise, same dog that had opinions about everything. Then she looked back at us.</p>
+
+      <p><span class="sheng">"Kelvin,"</span> she said simply, <span class="sheng">"anajua kucheza."</span></p>
+
+      <p><em>Kelvin knows how to play.</em></p>
+
+      <p>She said it the way you say something that is both a fact and a verdict and requires absolutely no further elaboration.</p>
+
+      <p>Terry raised her mug. I raised mine. Sheila raised hers.</p>
+
+      <p>Three mugs. Morning light coming through bad curtains. The bedsitter smelling like the night before and the day ahead. All of us somewhere on the other side of something — bruises carried more lightly, whatever had been heavy yesterday sitting differently today, not because it had disappeared but because the night had rearranged our relationship to it.</p>
+
+      <p>Outside somebody's music started up — the neighbour, the one who always played Gengetone at volumes that suggested he thought the whole estate needed a soundtrack.</p>
+
+      <p><span class="sheng">"Hii mtu,"</span> Terry murmured affectionately. <span class="translation">This person.</span></p>
+
+      <p>Sheila was already nodding her head to it.</p>
+    </article>
+
+    <div class="pull-quote">"<em>Leo tutaenjoy</em> had been Sheila's declaration yesterday morning.<br>We had. And somehow, improbably, beautifully — so had the morning after."</div>
+  </div>
+
+</main>
+
+<!-- SHARE -->
+<section class="share-section" id="share">
+  <p>// enjoyed the story? share it</p>
+  <div class="share-buttons">
+    <a class="share-twitter" href="https://twitter.com/intent/tweet?text=Just+read+Sick+O%27Clock+by+%40tonibraxxxxx+%E2%80%94+a+raw+Nairobi+campus+story+%F0%9F%92%A8+Go+read+it%21" target="_blank">Share on X / Twitter</a>
+    <a class="share-whatsapp" href="https://wa.me/?text=Read+this+story+%E2%80%94+Sick+O'Clock%3A+a+raw+Nairobi+campus+story" target="_blank">Share on WhatsApp</a>
+  </div>
+</section>
+
+<footer>
+  <p>SICK O'CLOCK &nbsp;|&nbsp; <span>A Nairobi Campus Story</span></p>
+  <p style="margin-top:0.6rem; font-size:0.78rem; opacity:0.9;">cc &copy; <span>Karani Wahome</span> &nbsp;·&nbsp; 2026 &nbsp;·&nbsp; <a href="https://twitter.com/tonibraxxxxx" target="_blank" style="color:#00FFFF; text-decoration:none;">@tonibraxxxxx</a></p>
+</footer>
+
+<script>
+  // Reading progress bar
+  window.addEventListener('scroll', () => {
+    const scrollTop = document.documentElement.scrollTop;
+    const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const progress = (scrollTop / docHeight) * 100;
+    document.getElementById('progress-bar').style.width = progress + '%';
+  });
+
+  // Scroll reveal for chapters
+  const chapters = document.querySelectorAll('.chapter');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.08 });
+
+  chapters.forEach(ch => observer.observe(ch));
+</script>
+</body>
+</html>
